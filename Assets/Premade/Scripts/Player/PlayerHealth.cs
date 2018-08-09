@@ -49,6 +49,8 @@ public class PlayerHealth : MonoBehaviour
 
     public void TakeDamage (int amount)
     {
+        if (isDead)
+            return;
         damaged = true;
 
         currentHealth -= amount;
@@ -57,7 +59,7 @@ public class PlayerHealth : MonoBehaviour
 
         playerAudio.Play ();
 
-        if(currentHealth <= 0 && !isDead)
+        if(currentHealth <= 0 )
         {
             Death ();
         }
@@ -66,15 +68,20 @@ public class PlayerHealth : MonoBehaviour
 
     void Death ()
     {
+        // 避免重複呼叫 你不會死了又死
         isDead = true;
 
+        // 用另一個腳本的方法關閉特效
         playerShooting.DisableEffects ();
 
+        // 撥放Trigger型態的動畫
         anim.SetTrigger ("Die");
 
+        // 更改audio source身上的音樂為死亡時的音樂並撥放
         playerAudio.clip = deathClip;
         playerAudio.Play ();
 
+        // 關閉移動及射擊腳本 (你死後是不會動的
         playerMovement.enabled = false;
         playerShooting.enabled = false;
     }
@@ -82,6 +89,6 @@ public class PlayerHealth : MonoBehaviour
 
     public void RestartLevel ()
     {
-        SceneManager.LoadScene (0);
+        //SceneManager.LoadScene (0);
     }
 }

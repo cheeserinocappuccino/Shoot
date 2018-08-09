@@ -49,7 +49,7 @@ public class EnemyHealth : MonoBehaviour
         hitParticles.transform.position = hitPoint;
         hitParticles.Play();
 
-        if(currentHealth <= 0)
+        if(currentHealth <= 0 )
         {
             Death ();
         }

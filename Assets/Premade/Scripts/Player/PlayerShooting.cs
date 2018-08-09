@@ -1,8 +1,11 @@
 ﻿using UnityEngine;
 
-public class PlayerShooting : MonoBehaviour
+public class PlayerShooting : MonoBehaviour,IWeapons
 {
+    public Sprite icon;
+    public Sprite Icon { get { return icon; } set { icon = value; } }
     public int damagePerShot = 20;
+    public int damagePer { get { return damagePerShot; } set { damagePerShot = value; } }
     public float timeBetweenBullets = 0.15f;
     public float range = 100f;
 
@@ -48,6 +51,8 @@ public class PlayerShooting : MonoBehaviour
     {
         gunLine.enabled = false;
         gunLight.enabled = false;
+
+        Debug.Log("playershooting.DisableEffects");
     }
 
 
@@ -80,6 +85,7 @@ public class PlayerShooting : MonoBehaviour
         else
         {
             gunLine.SetPosition (1, shootRay.origin + shootRay.direction * range);
+            
         }
     }
 }
