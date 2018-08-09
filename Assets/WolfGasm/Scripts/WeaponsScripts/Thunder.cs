@@ -17,6 +17,6 @@ public class Thunder : MonoBehaviour,IWeapons {
 
     public void DisableEffects()
     {
-        Debug.Log("Thunder.DisableEffects");
+        
     }
 }

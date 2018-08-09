@@ -52,7 +52,7 @@ public class PlayerShooting : MonoBehaviour,IWeapons
         gunLine.enabled = false;
         gunLight.enabled = false;
 
-        Debug.Log("playershooting.DisableEffects");
+        
     }
 
 

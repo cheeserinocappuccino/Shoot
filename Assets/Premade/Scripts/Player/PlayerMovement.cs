@@ -2,33 +2,115 @@
 
 public class PlayerMovement : MonoBehaviour
 {
-    public float speed = 6f;
+    enum State
+    {
+        normal,
+        dash
+    }
+    State state = new State();
+
+    public float normalSpeed = 6f;
+    private float speed ;
     private Vector3 movement;
     Animator anim;
     Rigidbody playerRigidbody;
     private int floorMask;
+    private int shootAbleMask;
     private float camRayLength = 100f;
+    float h;
+    float v;
 
+    bool dashEntry = false;
+    // 儲存玩家與滑鼠座標的向量
+    Vector3 playerToMouse = new Vector3(0,0,0);
+
+    // 衝刺方向
+    Vector3 dashDirection = new Vector3(0, 0, 0);
+
+
+
+    private bool isDashing = false;
+    public float dashDuration;
+    private float dashTime ;
+    public float dashSpeed;
     private void Awake()
     {
+        speed = normalSpeed;
         floorMask = LayerMask.GetMask("Floor");
+        shootAbleMask = LayerMask.GetMask("Shootable");
         anim = GetComponent<Animator>();
         playerRigidbody = GetComponent<Rigidbody>();
+        dashTime = dashDuration;
+        state = State.normal;
 
         
     }
 
     private void FixedUpdate()
     {
-        float h = Input.GetAxisRaw("Horizontal");
-        float v = Input.GetAxisRaw("Vertical");
+        switch (state)
+        {
+            case State.normal:
+                {
 
-        Move(h, v);
-        Turn();
-        Animating(h, v);
-        Dash(h,v);
+                    h = Input.GetAxisRaw("Horizontal");
+                    v = Input.GetAxisRaw("Vertical");
+
+                    Move(h, v);
+                    Turn();
+                    Animating(h, v);
+                    
+                    break;
+                }
+
+            case State.dash:
+                {
+                    Turn();
+                    // 給予衝刺時間限制
+                    dashTime -= Time.deltaTime;
+
+                    // 進入衝刺時提高速度
+                    if (dashEntry == false)
+                    {
+                        dashDirection = playerToMouse;
+                        speed = dashSpeed;
+                        dashEntry = true;
+
+                    }
+
+                    // 判定衝刺方向是否有障礙物 起點為角色衝刺的方向0.1單位(如果設在角色中間會導致背對障礙的時候也卡住
+                    bool dashIntoWall = Physics.Raycast(transform.position + (dashDirection.normalized*0.1f), dashDirection.normalized, 2.0f,shootAbleMask);
+
+                    if (dashIntoWall)
+                    {
+                        speed = 0;
+                        
+                    }
+
+                    // 移動角色 速度值會遞減
+                    speed = Mathf.Lerp(speed,0,0.2f);
+                    movement = dashDirection.normalized * speed * Time.deltaTime;
+                    playerRigidbody.MovePosition(transform.position + movement);
+
+                    // 衝刺結束後將數值回歸正常
+                    if (dashTime <= 0)
+                    {
+                        dashTime = dashDuration;
+                        dashEntry = false;
+                        speed = normalSpeed;
+                        state = State.normal;
+                    }
+
+                    break;
+                }
+        }
     }
 
+    private void Update()
+    {
+        Dash();
+
+    }
     private void Move(float h, float v)
     {
         //movement.Set(h, 0.0f, v);
@@ -55,7 +137,7 @@ public class PlayerMovement : MonoBehaviour
         if (Physics.Raycast(cameraRay, out floorHit, camRayLength, floorMask))
         {
             // 取得玩家與轉向目標點的向量
-            Vector3 playerToMouse = floorHit.point - transform.position;
+            playerToMouse = floorHit.point - transform.position;
 
             // 忽略y軸
             playerToMouse.y = 0.0f;
@@ -65,6 +147,7 @@ public class PlayerMovement : MonoBehaviour
 
             // 使用此函示實際旋轉玩家
             playerRigidbody.MoveRotation(newRotation);
+            
 
         }
     }
@@ -76,11 +159,14 @@ public class PlayerMovement : MonoBehaviour
 
     }
 
-    private void Dash(float h, float v)
+    private void Dash()
     {
-        if (Input.GetKey(KeyCode.V))
+        if (Input.GetKeyDown(KeyCode.Space))
         {
-            
+            state = State.dash;
         }
+
+
+
     }
 }

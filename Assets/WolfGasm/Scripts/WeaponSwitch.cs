@@ -29,12 +29,13 @@ public class WeaponSwitch : MonoBehaviour {
     // 武器欄位1~3的圖片
     public Image slot01, slot02, slot03;
     void Start () {
-        
+        slotAni = slotUI.GetComponent<Animator>();
         nowWeapon = 0;
-        
+        slotAni.SetBool("ChooseFirstWeapon", true);
+
         // 設定初始的三把武器
         weaponSlot[0] = GetComponent<PlayerShooting>();
-        weaponSlot[1] = GetComponent<NoWeapon>();
+        weaponSlot[1] = GetComponent<Laser>();
         weaponSlot[2] = GetComponent<NoWeapon>();
 
         // 設定初始的三把武器的介面
@@ -47,7 +48,7 @@ public class WeaponSwitch : MonoBehaviour {
         slot02.sprite = iweapons[1].Icon;
         slot03.sprite = iweapons[2].Icon;
 
-        slotAni = slotUI.GetComponent<Animator>();
+      
     }
 	
 	
@@ -66,6 +67,7 @@ public class WeaponSwitch : MonoBehaviour {
             // 切換武器時同時刪除其他武器的效果
             iweapons[1].DisableEffects();
             iweapons[2].DisableEffects();
+
         }
         else if (Input.GetKeyDown(KeyCode.Alpha2))
         {
