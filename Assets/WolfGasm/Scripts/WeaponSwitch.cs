@@ -26,12 +26,18 @@ public class WeaponSwitch : MonoBehaviour {
     public GameObject slotUI;
     private Animator slotAni;
 
+    // 角色自身血量的參考
+    PlayerHealth playerhealth;
+
     // 武器欄位1~3的圖片
     public Image slot01, slot02, slot03;
     void Start () {
         slotAni = slotUI.GetComponent<Animator>();
+        playerhealth = GetComponentInParent<PlayerHealth>();
+        
         nowWeapon = 0;
         slotAni.SetBool("ChooseFirstWeapon", true);
+
 
         // 設定初始的三把武器
         weaponSlot[0] = GetComponent<PlayerShooting>();
@@ -53,6 +59,8 @@ public class WeaponSwitch : MonoBehaviour {
 	
 	
 	void Update () {
+
+        DisableGuns();
 
         // 數字鍵1~3切換手上的武器
         if (Input.GetKeyDown(KeyCode.Alpha1))
@@ -141,5 +149,15 @@ public class WeaponSwitch : MonoBehaviour {
         iweapons[0] = (IWeapons)firstWeapon;
         iweapons[1] = (IWeapons)secondWeapon;
         iweapons[2] = (IWeapons)thirdWeapon;
+    }
+
+    public void DisableGuns()
+    {
+        if (playerhealth.currentHealth <= 0)
+        {
+            weaponSlot[0] = GetComponent<NoWeapon>();
+            weaponSlot[1] = GetComponent<NoWeapon>();
+            weaponSlot[2] = GetComponent<NoWeapon>();
+        }
     }
 }
